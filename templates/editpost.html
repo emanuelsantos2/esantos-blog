@@ -5,25 +5,31 @@
     <div class="row g-5">
       <div class="col-md-12">
           <p>New Post</p>
-              <form>
+              <form class="needs-validation" novalidate>
                   {% if post:%}
                   <div class="form-group">
-                      <input type="text" class="form-control" id="title" placeholder="Enter Post Title" value="{{post.title}}">
+                      <input type="text" class="form-control" id="title" placeholder="Enter Post Title" value="{{post.title}}" required>
+                      <div class="invalid-feedback">
+                        Please enter a title for this Post
+                      </div>
                   </div>
                   <input id="html_content" type="hidden" name="content" value="{{post.html_content}}">
                   <input id="user_id" type="hidden" name="user_id" value="{{current_user.id}}">
                   {% else %}
                   <div class="form-group">
-                    <input type="text" class="form-control" id="title" placeholder="Enter Post Title">
+                    <input type="text" class="form-control" id="title" placeholder="Enter Post Title" required>
+                    <div class="invalid-feedback">
+                      Please enter a title for this Post
+                    </div>
                   </div>
                   <input id="html_content" type="hidden" name="content">
                   <input id="user_id" type="hidden" name="user_id" value="{{current_user.id}}">
                   {% endif%}
                   <trix-editor input="html_content"></trix-editor>
                   <div class="form-group">
-                    <label for="categoryDropdown">Select Category:</label>
+                    <label for="categoryDropdown">Post Category:</label>
                     <div class="input-group">
-                        <select class="custom-select" id="categoryDropdown">
+                        <select class="form-select" id="categoryDropdown">
                           {% if post== post.category_id:%}
                             <option value="" selected disabled>Select or Add Category</option>
                           {% else %}
@@ -38,15 +44,12 @@
                             {% endfor %}
                             <option value="addNew">Add New Category</option>
                         </select>
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#addCategoryModal">Add New</button>
-                        </div>
                     </div>
                 </div>
                 {% if post:%}
-                  <a class="btn btn-dark" onclick="submitForm()">Save Post</a>
+                  <button class="btn btn-dark" onclick="submitForm()">Save Post</button>
                 {% else%}
-                  <a class="btn btn-dark" onclick="submitForm()">Submit Post</a>
+                  <button class="btn btn-dark" onclick="submitForm()">Submit Post</button>
                 {% endif%}
               </form>
           <hr>
@@ -61,7 +64,7 @@
       <div class="modal-content">
           <div class="modal-header">
               <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
               </button>
           </div>
@@ -72,7 +75,7 @@
               </div>
           </div>
           <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="button" class="btn btn-primary" onclick="addNewCategory()">Add Category</button>
           </div>
       </div>
@@ -82,6 +85,7 @@
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+<script src="{{ url_for('static', filename='form-validator.js') }}"></script>
 <script>
    $('#categoryDropdown').change(function () {
         // Check if the selected value is 'addNew'
