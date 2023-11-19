@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}- {{title}}{% endblock %}
+{% block content %}
+<main class="container">
+    <div class="row g-5">
+      <div class="col-md-12">
+          <article class="blog-post">
+            <div class="row g-5">
+            <div class="col-md-10"><h2 class="blog-post-title">{{title}}</h2></div>
+            {% if current_user.is_authenticated and current_user.user_type == 2 %}
+            <div class="col-md-2"><a type="button" href="{{ url_for('add_post',post_id=id) }}" class="btn btn-light">Edit</a><button id="delete" type="button" class="btn btn-light">Delete</button></div>
+            {% endif %}
+          </div>
+              <p class="blog-post-meta">{{created_at.strftime('%d %B, %Y')}} by {{author}}</p>
+              {{html_content|safe}}
+              <hr>
+          </article>
+  
+      </div>
+    </div>
+  </main>
+  
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(document).ready(function() {
+      // Button click event
+      $("#delete").click(function() {
+          // Make DELETE request
+          $.ajax({
+              url: '/posts/{{id}}',
+              type: 'DELETE',
+              success: function(data) {
+                  // Redirect to another page upon successful deletion
+                  window.location.href = "{{ url_for('index') }}"; 
+              },
+              error: function(error) {
+                  console.error('Error:', error);
+                  // Handle error if needed
+              }
+          });
+      });
+  });
+  </script>
+{% endblock %}

@@ -1,0 +1,58 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vroom Blog {% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom styles -->
+    <link href="https://fonts.googleapis.com/css?family=Playfair&#43;Display:700,900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.0/dist/trix.css">
+    <link href="{{ url_for('static', filename='blog.css') }}" rel="stylesheet">
+  </head>
+  <body>
+    
+    <div class="container">
+        <header class="blog-header py-3">
+          <div class="row flex-nowrap justify-content-between align-items-center">
+            <div class="col-4 pt-1">    
+            </div>
+            <div class="col-4 text-center">
+              <a class="blog-header-logo text-dark" href="/">Vroom Blog</a>
+            </div>
+            <div class="col-4 d-flex justify-content-end align-items-center">
+              {% if current_user.is_authenticated: %}
+                {% if current_user.user_type == 2: %}
+                <a class="btn btn-sm btn-outline-secondary" href="{{url_for('add_post')}}">Add Post</a>
+                {% endif %}
+                <a class="btn btn-sm btn-outline-secondary" href="{{url_for('logout')}}">Logout</a>
+              {% else %}
+                <a class="btn btn-sm btn-outline-secondary" href="{{url_for('login')}}">Login</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{{url_for('register')}}">Register</a>
+              {% endif %}
+            </div>
+          </div>
+        </header>
+      </div>
+
+      {% block content %}
+      {% endblock %}
+
+
+<footer class="blog-footer">
+  <p>
+    <a href="#">Back to top</a>
+  </p>
+</footer>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+{% block scripts %}
+{% endblock %}
+
+    
+  </body>
+</html>

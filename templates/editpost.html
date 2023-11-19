@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block title %}- Post Editor{% endblock %}
+{% block content %}
+<main class="container">
+    <div class="row g-5">
+      <div class="col-md-12">
+          <p>New Post</p>
+              <form>
+                  {% if post:%}
+                  <div class="form-group">
+                      <input type="text" class="form-control" id="title" placeholder="Enter Post Title" value="{{post.title}}">
+                  </div>
+                  <input id="html_content" type="hidden" name="content" value="{{post.html_content}}">
+                  <input id="user_id" type="hidden" name="user_id" value="{{current_user.id}}">
+                  {% else %}
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="title" placeholder="Enter Post Title">
+                  </div>
+                  <input id="html_content" type="hidden" name="content">
+                  <input id="user_id" type="hidden" name="user_id" value="{{current_user.id}}">
+                  {% endif%}
+                  <trix-editor input="html_content"></trix-editor>
+                  <div class="form-group">
+                    <label for="categoryDropdown">Select Category:</label>
+                    <div class="input-group">
+                        <select class="custom-select" id="categoryDropdown">
+                          {% if post== post.category_id:%}
+                            <option value="" selected disabled>Select or Add Category</option>
+                          {% else %}
+                            <option value="" disabled>Select or Add Category</option>
+                          {% endif%}
+                            {% for category in categories %}
+                              {% if post and category.id == post.category_id:%}
+                              <option selected value="{{category.id}}">{{category.name}}</option>
+                              {% else %}
+                              <option value="{{category.id}}">{{category.name}}</option>
+                              {% endif%}
+                            {% endfor %}
+                            <option value="addNew">Add New Category</option>
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#addCategoryModal">Add New</button>
+                        </div>
+                    </div>
+                </div>
+                {% if post:%}
+                  <a class="btn btn-dark" onclick="submitForm()">Save Post</a>
+                {% else%}
+                  <a class="btn btn-dark" onclick="submitForm()">Submit Post</a>
+                {% endif%}
+              </form>
+          <hr>
+      </div>
+    </div>
+  
+  </main>
+
+  <!-- Modal for adding a new category -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <div class="form-group">
+                  <label for="newCategoryInput">New Category Name:</label>
+                  <input type="text" class="form-control" id="newCategoryInput">
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="addNewCategory()">Add Category</button>
+          </div>
+      </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+<script>
+   $('#categoryDropdown').change(function () {
+        // Check if the selected value is 'addNew'
+        if ($(this).val() === 'addNew') {
+            // Open the modal
+            $('#addCategoryModal').modal('show');
+            // Reset the dropdown value to the default
+            $(this).val('');
+        }
+    });
+  function addNewCategory() {
+      // Get the value from the new category input
+      var newCategoryName = document.getElementById('newCategoryInput').value;
+
+      // Validate if the input is not empty
+      if (newCategoryName.trim() === "") {
+          alert("Please enter a category name.");
+          return;
+      }
+
+      fetch('/categories', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+            },
+            body: JSON.stringify({'name':newCategoryName})
+        })
+        .then(response => response.json())
+        .then(data => {
+
+          // Create a new option element
+      var newOption = document.createElement("option");
+
+        // Set the value and text of the new option
+        newOption.value = data.id;
+        newOption.text = data.name;
+
+        // Append the new option to the dropdown
+        document.getElementById('categoryDropdown').add(newOption);
+
+        })
+        .catch();
+
+      // Close the modal
+      $('#addCategoryModal').modal('hide');
+
+      // Clear the input field
+      document.getElementById('newCategoryInput').value = "";
+  }
+</script>
+<script type="text/javascript" src="https://unpkg.com/trix@2.0.0/dist/trix.umd.min.js"></script>
+<script>
+    function submitForm() {
+        // Get form data
+
+            var postData = {
+            title: document.getElementById('title').value,
+            user_id: document.getElementById('user_id').value,
+            html_content: document.getElementById('html_content').value,
+            category_id: document.getElementById('categoryDropdown').value
+        };
+    
+        // Make an AJAX request
+        {% if post:%}
+        fetch('/posts/{{post.id}}', {
+            method: 'PUT',
+            headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        })
+        {% else %}
+        fetch('/posts', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        })
+        {% endif%}
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response data
+            window.location.href = "/";
+        })
+        .catch();
+    }
+
+    (function() {
+  var HOST = "/img_upload"
+
+  addEventListener("trix-attachment-add", function(event) {
+    if (event.attachment.file) {
+      uploadFileAttachment(event.attachment)
+    }
+  })
+
+  function uploadFileAttachment(attachment) {
+    uploadFile(attachment.file, setProgress, setAttributes)
+
+    function setProgress(progress) {
+      attachment.setUploadProgress(progress)
+    }
+
+    function setAttributes(attributes) {
+      attachment.setAttributes(attributes)
+    }
+  }
+
+  function uploadFile(file, progressCallback, successCallback) {
+    var key = createStorageKey(file)
+    var formData = createFormData(key, file)
+    var xhr = new XMLHttpRequest()
+
+    xhr.open("POST", HOST, true)
+
+    xhr.upload.addEventListener("progress", function(event) {
+      var progress = event.loaded / event.total * 100
+      progressCallback(progress)
+    })
+
+    xhr.addEventListener("load", function(event) {
+      if (xhr.status == 201) {
+        response = JSON.parse(xhr.response)
+        var attributes = {
+          url: response.file_url,
+          href: response.file_url + "?content-disposition=attachment"
+        }
+        successCallback(attributes)
+      }
+    })
+
+    xhr.send(formData)
+  }
+
+  function createStorageKey(file) {
+    return file.name
+  }
+
+  function createFormData(key, file) {
+    var data = new FormData()
+    data.append("key", key)
+    data.append("Content-Type", file.type)
+    data.append("file", file)
+    return data
+  }
+})();
+    </script>
+{% endblock %}
