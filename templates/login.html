@@ -3,7 +3,8 @@
 {% block content %}
 <main class="container">
     <div class="row g-5">
-      <div class="col-md-12">
+      <div class="col-md-5 mx-auto">
+        <div class="myform mt-3 mb-3">
           <form action="/login" method="POST">
               <div class="form-group">
                 <label for="username">Username</label>
@@ -13,8 +14,9 @@
                 <label for="password">Password</label>
                 <input type="password" class="form-control" id="password" name="password" placeholder="Password">
               </div>
-              <button type="submit" class="btn btn-primary">Login</button>
+              <button type="submit" class="btn w-100 btn-light">Login</button>
             </form>
+          </div>
       </div>
     </div>
   </main> 
