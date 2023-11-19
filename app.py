@@ -91,9 +91,13 @@ def index(page_id=1, category_id=False):
         posts = db.paginate(Post.query.filter_by(category_id=category_id).order_by(Post.created_at.desc()), max_per_page=5, page=page_id)
     else:
         posts = db.paginate(db.select(Post).order_by(Post.created_at.desc()), max_per_page=5, page=page_id)
-    pages = posts.iter_pages()
-    print(pages)
-    return render_template('main.html', page_id=page_id, posts=posts, categories=Category().query.all())
+
+    #Gets Categories and removes categories that don't contain posts
+    categories = []
+    for category in Category().query.all():
+        if Post.query.filter_by(category_id=category.id).count() > 0:
+            categories.append(category)
+    return render_template('main.html', page_id=page_id, posts=posts, categories=categories)
 
 @app.route('/admin/edit_post', methods=['GET'])
 @app.route('/admin/edit_post/<int:post_id>', methods=['GET'])
