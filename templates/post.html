@@ -10,19 +10,19 @@
 {% block content %}
 <div class="container-md px-5 mt-3">
     <div class="row">
-        <div class="col-9">
+        <div class="col-md-9">
                 <h2>{{title}}</h2>
                 <p>{{created_at.strftime('%d %B, %Y')}} by {{author}}</p>
                 <div class="post-content">
                     {{html_content|safe}}
                 </div>
         </div>
-        <div class="col-3 sticky-top">
+        <div class="col-md-3 sticky-top">
             <div class="">
                 <img src="{{img_url}}" alt="Image" class="img-fluid"> <!-- Add your image source -->
 
             </div>
-            <div class="right-category">
+            <div class="right-category mt-3 mb-3">
                 <a style="color:black" href="/posts_list/categories/{{category.id}}"><h3>See more {{category.name}} Reviews</h3></a>
                 <a class="btn">
                     <img src="{{category.img_url}}" alt="Image" class="mr-2 btn-categories-img"> <!-- Add your image source -->
