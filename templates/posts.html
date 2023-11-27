@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-md px-5 mt-5">
+    <div class="row text-center">
+        <h1>Car Reviews</h1>
+    </div>
+    <div class="row mt-5">
+        {% for post in posts %}
+        <div class="col-md-6 mt-2">
+            <div class="blog-post-container">
+                <!-- Blog Post Image -->
+                <img class="blog-post-image rounded" src="{{post.img_url}}" alt="Blog Post Image">
+            
+                <!-- Blog Post Title -->
+                <a href="{{ url_for('post',id=post.id) }}"><h3 class="blog-post-title">{{post.title}}</h3></a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="row pt-4">
+        <nav class="blog-pagination text-center" aria-label="Pagination">
+            {% for page in posts.iter_pages() %}
+                {% if page %}
+                    {% if page != posts.page %}
+                    <a href="{{ url_for('posts_page', page_id=page) }}">{{ page }}</a>
+                    {% else %}
+                    <strong>Page {{ page }}</strong>
+                    {% endif %}
+                {% else %}
+                    <span class=ellipsis>…</span>
+                {% endif %}
+            {% endfor %}
+            <!--<a class="btn btn-outline-primary" href="#">Older</a>
+            <a class="btn btn-outline-secondary disabled">Newer</a>-->
+          </nav>
+    </div>
+</div>
+{% endblock %}

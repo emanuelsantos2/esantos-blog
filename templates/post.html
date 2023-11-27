@@ -1,24 +1,38 @@
 {% extends "base.html" %}
 {% block title %}- {{title}}{% endblock %}
+{% block post_editor %}
+    {% if current_user.is_authenticated and current_user.user_type == 2 %}
+        <a type="button" href="{{ url_for('add_post',post_id=id) }}" class="btn btn-outline-light"><i class="fa-solid fa-pencil"></i> Edit Post</a>
+        <a type="button" id="delete" class="btn btn-outline-light">Delete Post <i class="fa-solid fa-trash-can"></i></a>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
-<main class="container">
-    <div class="row g-5">
-      <div class="col-md-12">
-          <article class="blog-post">
-            <div class="row">
-            <div class="col-md-10"><h2 class="blog-post-title">{{title}}</h2></div>
-            {% if current_user.is_authenticated and current_user.user_type == 2 %}
-            <div class="col-md-2"><a type="button" href="{{ url_for('add_post',post_id=id) }}" class="btn btn-light">Edit</a><a id="delete" type="button" class="btn btn-light">Delete</a></div>
-            {% endif %}
-          </div>
-              <p class="blog-post-meta">{{created_at.strftime('%d %B, %Y')}} by {{author}}</p>
-              {{html_content|safe}}
-              <hr>
-          </article>
-  
-      </div>
+<div class="container-md px-5 mt-3">
+    <div class="row">
+        <div class="col-9">
+                <h2>{{title}}</h2>
+                <p>{{created_at.strftime('%d %B, %Y')}} by {{author}}</p>
+                <div class="post-content">
+                    {{html_content|safe}}
+                </div>
+        </div>
+        <div class="col-3 sticky-top">
+            <div class="">
+                <img src="{{img_url}}" alt="Image" class="img-fluid"> <!-- Add your image source -->
+
+            </div>
+            <div class="right-category">
+                <a style="color:black" href="/posts_list/categories/{{category.id}}"><h3>See more {{category.name}} Reviews</h3></a>
+                <a class="btn">
+                    <img src="{{category.img_url}}" alt="Image" class="mr-2 btn-categories-img"> <!-- Add your image source -->
+                    {{category.name}}
+                </a>
+            </div>
     </div>
-  </main>
+    </div>
+</div>
+
   
 {% endblock %}
 

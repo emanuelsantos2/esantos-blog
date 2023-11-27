@@ -46,7 +46,7 @@ def insert_post():
         post_data = request.json
         if not post_data['title']:
             return "Invalid Request", 400
-        new_post = Post(title=post_data['title'],html_content=post_data['html_content'], user_id=post_data['user_id'], category_id=post_data['category_id'])
+        new_post = Post(title=post_data['title'],html_content=post_data['html_content'], user_id=post_data['user_id'], category_id=post_data['category_id'], img_url=post_data['img_url'])
         db.session.add(new_post)
         db.session.commit()
         return jsonify(title=post_data['title'],html_content=post_data['html_content']), 201
@@ -62,10 +62,11 @@ def post(id):
 
     if request.method == 'GET':
         if 'application/json' in content_type:
-            return jsonify(id=post.id, title=post.title, html_content=post.html_content)
+            return jsonify(id=post.id, title=post.title, html_content=post.html_content, img_url=post.img_url)
         else:
+            category = Category.query.get(post.category_id)
             # Return HTML if the 'Accept' header does not specify JSON
-            return render_template('post.html', id=post.id, title=post.title, html_content=post.html_content, created_at=post.created_at, author=post.author)
+            return render_template('post.html', id=post.id, title=post.title, img_url=post.img_url, html_content=post.html_content, created_at=post.created_at, author=post.author, category=category)
         
     elif request.method == "PUT":
         if 'application/json' in content_type:
@@ -82,22 +83,34 @@ def post(id):
         db.session.commit()
         return jsonify(message="Deleted Successfully"), 204
 
-
 @app.route('/', methods=['GET']) 
-@app.route('/<int:page_id>', methods=['GET'])
-@app.route('/categories/<int:category_id>', methods=['GET'])
-def index(page_id=1, category_id=False):
+def index():
+    main_post = Post.query.order_by(Post.id.desc()).first()
+    posts = Post.query.order_by(Post.id.desc()).slice(1, 3).all()
+    top_posts = Post.query.slice(0, 3).all()
+    #Gets Categories and removes categories that don't contain posts
+    categories = []
+    for category in Category().query.all():
+        if Post.query.filter_by(category_id=category.id).count() > 0:
+            categories.append(category)
+    return render_template('main.html', main_post=main_post, posts=posts, categories=categories, top_posts=top_posts)        
+
+
+@app.route('/posts_list/', methods=['GET']) 
+@app.route('/posts_list/<int:page_id>', methods=['GET'])
+@app.route('/posts_list/categories/<int:category_id>', methods=['GET'])
+def posts_page(page_id=1, category_id=False):
     if category_id:
-        posts = db.paginate(Post.query.filter_by(category_id=category_id).order_by(Post.created_at.desc()), max_per_page=5, page=page_id)
+        posts = db.paginate(Post.query.filter_by(category_id=category_id).order_by(Post.created_at.desc()), max_per_page=6, page=page_id)
     else:
-        posts = db.paginate(db.select(Post).order_by(Post.created_at.desc()), max_per_page=5, page=page_id)
+        posts = db.paginate(db.select(Post).order_by(Post.created_at.desc()), max_per_page=6, page=page_id)
 
     #Gets Categories and removes categories that don't contain posts
     categories = []
     for category in Category().query.all():
         if Post.query.filter_by(category_id=category.id).count() > 0:
             categories.append(category)
-    return render_template('main.html', page_id=page_id, posts=posts, categories=categories)
+    return render_template('posts.html', page_id=page_id, posts=posts, categories=categories)
 
 @app.route('/admin/edit_post', methods=['GET'])
 @app.route('/admin/edit_post/<int:post_id>', methods=['GET'])
@@ -116,14 +129,14 @@ def categories():
     content_type = request.headers.get('Accept')
     if request.method == 'POST':
         category_data = request.json
-        new_category = Category(name=category_data['name'])
+        new_category = Category(name=category_data['name'], img_url=category_data['img_url'])
         db.session.add(new_category)
         db.session.commit()
         return jsonify(id=new_category.id, name=new_category.name), 201
     if request.method == 'GET':
         if 'application/json' in content_type:
             categories = Category.query.all()
-            categories = [{'id': category.id, 'name': category.name} for category in categories]
+            categories = [{'id': category.id, 'name': category.name, 'img_url': category.img_url} for category in categories]
             return jsonify(categories)
         else:
             return "Invalid Request", 400

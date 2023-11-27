@@ -46,6 +46,18 @@
                         </select>
                     </div>
                 </div>
+                <div class="form-group">
+                  <label for="categoryDropdown">Main Image:</label>
+                  <div class="input-group">
+                    <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event, 'img_url')">
+                    <!-- Hidden field to store the image URL -->
+                    {% if post:%}
+                    <input type="hidden" id="img_url">
+                    {% else%}
+                    <input type="hidden" id="img_url" value="{{post.img_url}}">
+                    {% endif%}
+                  </div>
+              </div>
                 {% if post:%}
                   <button class="btn btn-dark" onclick="submitForm()">Save Post</button>
                 {% else%}
@@ -73,6 +85,14 @@
                   <label for="newCategoryInput">New Category Name:</label>
                   <input type="text" class="form-control" id="newCategoryInput">
               </div>
+              <div class="form-group">
+                <label for="categoryDropdown">Category Image:</label>
+                <div class="input-group">
+                  <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event, 'modal_img_url')">
+                  <!-- Hidden field to store the image URL -->
+                  <input type="hidden" id="modal_img_url">
+                </div>
+            </div>
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -99,6 +119,7 @@
   function addNewCategory() {
       // Get the value from the new category input
       var newCategoryName = document.getElementById('newCategoryInput').value;
+      var newCategoryImgUrl = document.getElementById('modal_img_url').value;
 
       // Validate if the input is not empty
       if (newCategoryName.trim() === "") {
@@ -112,7 +133,7 @@
             'Content-Type': 'application/json',
             'Accept': 'application/json'
             },
-            body: JSON.stringify({'name':newCategoryName})
+            body: JSON.stringify({'name':newCategoryName, 'img_url':newCategoryImgUrl})
         })
         .then(response => response.json())
         .then(data => {
@@ -146,7 +167,8 @@
             title: document.getElementById('title').value,
             user_id: document.getElementById('user_id').value,
             html_content: document.getElementById('html_content').value,
-            category_id: document.getElementById('categoryDropdown').value
+            category_id: document.getElementById('categoryDropdown').value,
+            img_url: document.getElementById('img_url').value
         };
     
         // Make an AJAX request
@@ -237,4 +259,37 @@
   }
 })();
     </script>
+
+<script>
+  function handleImageUpload(event, input_field) {
+    const fileInput = event.target;
+
+    // Check if a file was selected
+    if (fileInput.files.length > 0) {
+        // Upload the image file along with additional data as FormData
+        uploadImage(fileInput.files[0], input_field);
+    }
+}
+
+function uploadImage(file, input_field) {
+
+    const formData = new FormData();
+    formData.append('Content-Type', file.type);
+    formData.append('file', file);
+
+    // Replace 'your-upload-url' with the actual URL where you want to upload the image
+    fetch('/img_upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById(input_field).value = data.file_url;
+        console.log('Image uploaded successfully:', data);
+    })
+    .catch(error => {
+        console.error('Error uploading image:', error);
+    });
+}
+  </script>
 {% endblock %}

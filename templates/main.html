@@ -1,58 +1,80 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main class="container">
-
-
-    <div class="row g-5">
-      <div class="col-md-8">
-        {% for post in posts %}
-          <article class="blog-post">
-              <h2 class="blog-post-title"><a href="{{ url_for('post',id=post.id) }}">{{post.title}}</a></h2>
-              <p class="blog-post-meta">{{post.created_at.strftime('%d %B, %Y')}}</p>
-              {{post.html_content|safe}}
-              <hr>
-          </article>
-        {% endfor %}
-  
-  
-        <nav class="blog-pagination" aria-label="Pagination">
-          {% for page in posts.iter_pages() %}
-              {% if page %}
-                  {% if page != posts.page %}
-                  <a href="{{ url_for('index', page_id=page) }}">{{ page }}</a>
-                  {% else %}
-                  <strong>Page {{ page }}</strong>
-                  {% endif %}
-              {% else %}
-                  <span class=ellipsis>…</span>
-              {% endif %}
-          {% endfor %}
-          <!--<a class="btn btn-outline-primary" href="#">Older</a>
-          <a class="btn btn-outline-secondary disabled">Newer</a>-->
-        </nav>
-  
-      </div>
-  
-      <div class="col-md-4">
-        <div class="position-sticky" style="top: 2rem;">
-          <div class="p-4 mb-3 bg-light rounded">
-            <h4 class="fst-italic">About</h4>
-            <p class="mb-0">Welcome to the Vroom Blog, where we explore the world of cars with passion and expertise. Dive into a captivating journey through the latest car models.</p>
-          </div>
-  
-          <div class="p-4">
-            <h4 class="fst-italic">Categories</h4>
-            <ol class="list-unstyled mb-0">
-              {% for category in categories %}
-              <li><a href="/categories/{{category.id}}">{{category.name}}</a></li>
-              {% endfor %}
-            </ol>
-          </div>
-        </div>
-      </div>
+<div class="container-md px-5 mt-5">
+    <div class="row text-center">
+        <h1 class="font-weight-bold">Welcome to the Vroom Blog</h1>
+        <h4>The best source of car reviews online.</h4>
+        <a class="btn" type="submit"><i class="fa-brands fa-github"></i></a>
     </div>
-  
-  </main>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="blog-post-container">
+                <!-- Blog Post Image -->
+                <img class="blog-post-image rounded" src="{{main_post.img_url}}" alt="Blog Post Image">
+            
+                <!-- Blog Post Title -->
+                <div class="blog-post-title">
+                    <h1 class="">{{main_post.title}}</h1>
+                    <a type="button rounded" href="{{ url_for('post',id=main_post.id) }}" class="btn btn-outline-light">Read Article <i class="fa-brands fa-readme"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            {% for post in posts %}
+            <div class="blog-post-container mb-2">
+                <!-- Blog Post Image -->
+                <img class="blog-post-image rounded" src="{{post.img_url}}" alt="Blog Post Image">
+            
+                <!-- Blog Post Title -->
+                <a href="{{ url_for('post',id=post.id) }}"><h3 class="blog-post-title">{{post.title}}</h3></a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row mt-1">
+        <a type="button"  href="{{ url_for('posts_page',page_id=1) }}" class="btn btn-outline-light text-dark">See More</a>
+    </div>
+</div>
 
+<div class="container-fluid bg-dark text-white pb-5">
+    <div class="row pt-2">
+        <div class="col">
+            <h3 class="text-center">
+            Explore all our reviews
+            </h3>
+        </div>
+    </div>
+    <div class="container-md px-5 mt-5">
+        <div class="row mt-1 text-center">
+            {% for category in categories %}
+            <div class="col-2 text-white categories-card mt-2">
+                <a class="btn" href="/posts_list/categories/{{category.id}}">
+                    <img src="{{category.img_url}}" alt="Image" class="mr-2 btn-categories-img"> <!-- Add your image source -->
+                    {{category.name}}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="container-md px-5 pb-5 mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="text-center">
+            Our top reviews
+            </h3>
+        </div>
+        {% for post in top_posts %}
+        <div class="col-md-4">
+            <div class="post-container">
+              <div class="round-image rounded">
+                <img src="{{post.img_url}}" class="img-fluid">
+              </div>
+              <a href="{{ url_for('post',id=main_post.id) }}" style="color:black;"><h3 class="mt-2 text-center">{{post.title}}</h3></a>
+            </div>
+          </div>
+          {% endfor %}
+    </div>
+</div>
 {% endblock %}
