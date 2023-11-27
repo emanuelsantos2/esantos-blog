@@ -55,7 +55,7 @@ body {
         left: 0;
         width: 100%;
         padding: 10px;
-        /*background-color: rgba(0, 0, 0, 0.7); */
+        background-color: rgba(0, 0, 0, 0.4); 
         color: #fff; /* White text */
         margin: 0;
         opacity: 1; /* Initially hidden */

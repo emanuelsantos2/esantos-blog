@@ -5,7 +5,7 @@
     <div class="row text-center">
         <h1 class="font-weight-bold">Welcome to the Vroom Blog</h1>
         <h4>The best source of car reviews online.</h4>
-        <a class="btn" type="submit"><i class="fa-brands fa-github"></i></a>
+        <a class="text-black" href="https://github.com/emanuelsantos2/esantos-blog" type="submit"><i class="fa-brands fa-github"></i></a>
     </div>
     <div class="row">
         <div class="col-md-8">
@@ -71,7 +71,7 @@
               <div class="round-image rounded">
                 <img src="{{post.img_url}}" class="img-fluid">
               </div>
-              <a href="{{ url_for('post',id=main_post.id) }}" style="color:black;"><h3 class="mt-2 text-center">{{post.title}}</h3></a>
+              <a href="{{ url_for('post',id=post.id) }}" style="color:black;"><h3 class="mt-2 text-center">{{post.title}}</h3></a>
             </div>
           </div>
           {% endfor %}
